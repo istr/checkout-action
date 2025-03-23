@@ -1,18 +1,18 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # SPDX-License-Identifier: Apache-2.0 OR MIT
-set -CeEuo pipefail
-IFS=$'\n\t'
+set -Ceuo
+IFS=$(printf '\n\t')
 
 g() {
   IFS=' '
-  local cmd="$*"
-  IFS=$'\n\t'
-  printf '::group::%s\n' "${cmd#retry }"
+  __g_cmd="$*"
+  IFS=$(printf '\n\t')
+  printf '::group::%s\n' "${__g_cmd#retry }"
   "$@"
   printf '::endgroup::\n'
 }
 retry() {
-  for i in {1..10}; do
+  for i in 1 2 3 4 5 6 7 8 9 10; do
     if "$@"; then
       return 0
     else
@@ -29,7 +29,7 @@ warn() {
   printf '::warning::%s\n' "$*"
 }
 _sudo() {
-  if type -P sudo >/dev/null; then
+  if command -v sudo >/dev/null; then
     sudo "$@"
   else
     "$@"
@@ -40,7 +40,7 @@ apt_update() {
   apt_updated=1
 }
 apt_install() {
-  if [[ -z "${apt_updated:-}" ]]; then
+  if test -z "${apt_updated:-}"; then
     apt_update
   fi
   retry _sudo apt-get -o Acquire::Retries=10 -o Dpkg::Use-Pty=0 install -y --no-install-recommends "$@"
@@ -56,9 +56,9 @@ pacman_install() {
 }
 # NB: sync with action.yml
 apk_install() {
-  if type -P sudo >/dev/null; then
+  if command -v sudo >/dev/null; then
     retry sudo apk --no-cache add "$@"
-  elif type -P doas >/dev/null; then
+  elif command -v doas >/dev/null; then
     retry doas apk --no-cache add "$@"
   else
     retry apk --no-cache add "$@"
@@ -71,7 +71,7 @@ opkg_update() {
   opkg_updated=1
 }
 opkg_install() {
-  if [[ -z "${opkg_updated:-}" ]]; then
+  if test -z "${opkg_updated:-}"; then
     opkg_update
   fi
   retry _sudo opkg install "$@"
@@ -93,33 +93,25 @@ base_distro=''
 case "$(uname -s)" in
   Linux)
     host_os=linux
-    if [[ -e /etc/os-release ]]; then
-      if grep -Eq '^ID_LIKE=' /etc/os-release; then
-        base_distro=$(grep -E '^ID_LIKE=' /etc/os-release | cut -d= -f2)
-        case "${base_distro}" in
-          *debian*) base_distro=debian ;;
-          *fedora*) base_distro=fedora ;;
-          *suse*) base_distro=suse ;;
-          *arch*) base_distro=arch ;;
-          *alpine*) base_distro=alpine ;;
-          *openwrt*) base_distro=openwrt ;;
-        esac
-      else
-        base_distro=$(grep -E '^ID=' /etc/os-release | cut -d= -f2)
-      fi
-      base_distro="${base_distro//\"/}"
-    elif [[ -e /etc/redhat-release ]]; then
+    if test -e /etc/os-release; then
+      while IFS='=' read -r key value; do
+        if test "${key}" = "ID" -o "${key}" = "ID_LIKE"; then
+          base_distro="${value}"
+          break
+        fi
+      done </etc/os-release
+    elif test -e /etc/redhat-release; then
       # /etc/os-release is available on RHEL/CentOS 7+
       base_distro=fedora
-    elif [[ -e /etc/debian_version ]]; then
+    elif test -e /etc/debian_version; then
       # /etc/os-release is available on Debian 7+
       base_distro=debian
     fi
     case "${base_distro}" in
       fedora)
         dnf=dnf
-        if ! type -P dnf >/dev/null; then
-          if type -P microdnf >/dev/null; then
+        if ! command -v dnf >/dev/null; then
+          if command -v microdnf >/dev/null; then
             # fedora-based distributions have "minimal" images that
             # use microdnf instead of dnf.
             dnf=microdnf
@@ -138,7 +130,7 @@ case "$(uname -s)" in
   *) bail "unrecognized OS type '$(uname -s)'" ;;
 esac
 
-if ! type -P git >/dev/null; then
+if ! command -v git >/dev/null; then
   case "${host_os}" in
     linux*)
       case "${base_distro}" in
@@ -174,7 +166,7 @@ g git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
 
 g git config --local gc.auto 0
 
-if [[ "${GITHUB_REF}" == "refs/heads/"* ]]; then
+if test "${GITHUB_REF}" == "refs/heads/"*; then
   branch="${GITHUB_REF#refs/heads/}"
   remote_ref="refs/remotes/origin/${branch}"
   g retry git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin "+${GITHUB_SHA}:${remote_ref}"

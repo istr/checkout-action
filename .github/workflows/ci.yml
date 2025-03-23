@@ -46,19 +46,19 @@ jobs:
           - os: macos-15
           - os: windows-2019
           - os: windows-2019
-            bash: msys64
+            sh: msys64
           - os: windows-2019
-            bash: cygwin
+            sh: cygwin
           - os: windows-2022
           - os: windows-2022
-            bash: msys64
+            sh: msys64
           - os: windows-2022
-            bash: cygwin
+            sh: cygwin
           - os: windows-2025
           - os: windows-2025
-            bash: msys64
+            sh: msys64
           - os: windows-2025
-            bash: cygwin
+            sh: cygwin
     runs-on: ${{ matrix.os }}
     steps:
       - run: lscpu
@@ -68,12 +68,12 @@ jobs:
       - run: |
           printf '%s\n' 'C:\msys64\mingw32\bin' >>"${GITHUB_PATH}"
           printf '%s\n' 'C:\msys64\usr\bin' >>"${GITHUB_PATH}"
-        if: matrix.bash == 'msys64'
+        if: matrix.sh == 'msys64'
       - run: |
           choco install --no-progress --requirechecksums cygwin
           printf '%s\n' 'C:\tools\cygwin\bin' >>"${GITHUB_PATH}"
           printf '%s\n' 'C:\tools\cygwin\usr\bin' >>"${GITHUB_PATH}"
-        if: matrix.bash == 'cygwin'
+        if: matrix.sh == 'cygwin'
       # TODO: use the current branch instead of @main
       - uses: taiki-e/checkout-action@main
       - uses: taiki-e/install-action@shellcheck

@@ -9,3 +9,6 @@ opkg
 pluginconf
 rootfs
 runneradmin
+Ceuo
+Euxo
+pipefail

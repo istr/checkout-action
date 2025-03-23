@@ -45,7 +45,7 @@
   "languageSettings": [
     {
       "languageId": ["*"],
-      "dictionaries": ["bash", "cpp-refined", "rust"]
+      "dictionaries": ["sh", "cpp-refined", "rust"]
     }
   ],
   "ignorePaths": []
