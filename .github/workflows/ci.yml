@@ -63,12 +63,12 @@ jobs:
       - run: |
           printf '%s\n' 'C:\msys64\mingw32\bin' >>"${GITHUB_PATH}"
           printf '%s\n' 'C:\msys64\usr\bin' >>"${GITHUB_PATH}"
-        if: matrix.sh == 'msys64'
+        if: matrix.sh = 'msys64'
       - run: |
           choco install --no-progress --requirechecksums cygwin
           printf '%s\n' 'C:\tools\cygwin\bin' >>"${GITHUB_PATH}"
           printf '%s\n' 'C:\tools\cygwin\usr\bin' >>"${GITHUB_PATH}"
-        if: matrix.sh == 'cygwin'
+        if: matrix.sh = 'cygwin'
       # TODO: use the current branch instead of @main
       - uses: istr/checkout-action@posix
       - uses: taiki-e/install-action@shellcheck
@@ -142,7 +142,8 @@ jobs:
           sed -i /etc/yum.repos.d/*.repo -e 's!^mirrorlist!#mirrorlist!' \
             -e 's!^#baseurl=http://mirror.centos.org/!baseurl=https://vault.centos.org/!'
           sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
-          if [[ "${{ matrix.container }}" == "centos:6" ]]; then
+          if test "${{ matrix.container }}" = "centos:6"
+          then
             # CentOS 6's git (1.7.1) has no --local/--no-recurse-submodules.
             # And even if we don't pass those flags, that version of git will not work
             # anyway due to of "fatal: Couldn't find remote ref" error.
