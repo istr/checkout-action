@@ -15,5 +15,5 @@ runs:
         fi
       shell: sh
       if: runner.os	== 'Linux'
-    - run: sh --noprofile --norc "${GITHUB_ACTION_PATH:?}/main.sh"
+    - run: sh "${GITHUB_ACTION_PATH:?}/main.sh"
       shell: sh

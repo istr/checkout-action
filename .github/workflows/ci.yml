@@ -10,7 +10,7 @@ on:
 
 defaults:
   run:
-    shell: bash --noprofile --norc -CeEuxo pipefail {0}
+    shell: sh -Ceuxo {0}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -153,5 +153,5 @@ jobs:
           fi
         if: startsWith(matrix.container, 'centos')
       # TODO: use the current branch instead of @main
-      - uses: taiki-e/checkout-action@main
+      - uses: istr/checkout-action@posix
       - run: git ls-files
