@@ -10,7 +10,7 @@ on:
 
 defaults:
   run:
-    shell: sh -Ceuxo {0}
+    shell: sh -Ceux {0}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
