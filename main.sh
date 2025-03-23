@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # SPDX-License-Identifier: Apache-2.0 OR MIT
-set -Ceuo
+set -Ceu
 IFS=$(printf '\n\t')
 
 g() {
@@ -166,8 +166,7 @@ g git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
 
 g git config --local gc.auto 0
 
-if test "${GITHUB_REF}" = "refs/heads/"*
-then
+if test "${GITHUB_REF}" = "refs/heads/"*; then
   branch="${GITHUB_REF#refs/heads/}"
   remote_ref="refs/remotes/origin/${branch}"
   g retry git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin "+${GITHUB_SHA}:${remote_ref}"
