@@ -95,7 +95,11 @@ case "$(uname -s)" in
     host_os=linux
     if test -e /etc/os-release; then
       while IFS='=' read -r key value; do
-        if test "${key}" = "ID" -o "${key}" = "ID_LIKE"; then
+        if test "${key}" = "ID"
+        then
+          base_distro="${value}"
+        elif test "${key}" = "ID_LIKE"
+        then
           base_distro="${value}"
           break
         fi
@@ -130,7 +134,8 @@ case "$(uname -s)" in
   *) bail "unrecognized OS type '$(uname -s)'" ;;
 esac
 
-if ! command -v git >/dev/null; then
+if ! command -v git >/dev/null
+then
   case "${host_os}" in
     linux*)
       case "${base_distro}" in
