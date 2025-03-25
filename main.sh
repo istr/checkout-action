@@ -104,7 +104,14 @@ case "$(uname -s)" in
         if test "${key}" = "ID"; then
           base_distro="${value}"
         elif test "${key}" = "ID_LIKE"; then
-          base_distro="${value}"
+          case "${value}" in
+            *debian*) base_distro=debian ;;
+            *fedora*) base_distro=fedora ;;
+            *suse*) base_distro=suse ;;
+            *arch*) base_distro=arch ;;
+            *alpine*) base_distro=alpine ;;
+            *openwrt*) base_distro=openwrt ;;
+          esac
           break
         fi
       done </etc/os-release
@@ -138,7 +145,7 @@ if ! command -v git >/dev/null; then
   case "${host_os}" in
     linux*)
       case "${base_distro}" in
-        debian | fedora* | suse* | arch | alpine | openwrt)
+        debian | fedora | suse | arch | alpine | openwrt)
           printf '::group::Install packages required for checkout (git)\n'
           case "${base_distro}" in
             debian) sys_install ca-certificates git ;;
