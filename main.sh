@@ -93,7 +93,13 @@ base_distro=''
 case "$(uname -s)" in
   Linux)
     host_os=linux
-    if test -e /etc/os-release; then
+    if test -e /etc/redhat-release; then
+      # /etc/os-release is available on RHEL/CentOS 7+
+      base_distro=fedora
+    elif test -e /etc/debian_version; then
+      # /etc/os-release is available on Debian 7+
+      base_distro=debian
+    elif test -e /etc/os-release; then
       while IFS='=' read -r key value; do
         if test "${key}" = "ID"; then
           base_distro="${value}"
@@ -102,12 +108,6 @@ case "$(uname -s)" in
           break
         fi
       done </etc/os-release
-    elif test -e /etc/redhat-release; then
-      # /etc/os-release is available on RHEL/CentOS 7+
-      base_distro=fedora
-    elif test -e /etc/debian_version; then
-      # /etc/os-release is available on Debian 7+
-      base_distro=debian
     fi
     case "${base_distro}" in
       fedora)
