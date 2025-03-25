@@ -838,9 +838,9 @@ EOF
         esac
         default_shell=$(jq -r -c '.defaults.run.shell' <<<"${workflow}")
         # github's default is https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#defaultsrunshell
-        re='^bash --noprofile --norc -CeEux?o pipefail \{0}$'
+        re='^sh -Ceux \{0}$'
         if [[ ! "${default_shell}" =~ ${re} ]]; then
-          error "${workflow_path}: defaults.run.shell should be 'bash --noprofile --norc -CeEuxo pipefail {0}' or 'bash --noprofile --norc -CeEuo pipefail {0}'"
+          error "${workflow_path}: defaults.run.shell should be 'sh -Ceux {0}'"
           continue
         fi
         # .steps == null means the job is the caller of reusable workflow
