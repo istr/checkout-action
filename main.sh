@@ -108,6 +108,8 @@ case "$(uname -s)" in
           break
         fi
       done </etc/os-release
+      base_distro="${base_distro#\"}"
+      base_distro="${base_distro%\"}"
     fi
     case "${base_distro}" in
       fedora)
@@ -136,7 +138,7 @@ if ! command -v git >/dev/null; then
   case "${host_os}" in
     linux*)
       case "${base_distro}" in
-        debian | fedora | suse | arch | alpine | openwrt)
+        debian | fedora* | suse* | arch | alpine | openwrt)
           printf '::group::Install packages required for checkout (git)\n'
           case "${base_distro}" in
             debian) sys_install ca-certificates git ;;
